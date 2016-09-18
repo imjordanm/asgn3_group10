@@ -37,6 +37,8 @@ public class VetQuery {
 	    con = DriverManager.getConnection(url, user, pass);
 	    System.out.println("Connected to Oracle");
 
+		//USE THIS SECTION TO ADD YOUR QUERIES
+		
 		// Query Vet IRD
 		String vetird = getVetInfo(con);
 		System.out.print("VET IRD: ");
