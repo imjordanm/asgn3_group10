@@ -14,8 +14,8 @@
 
 	Maintain stock level of prescribed medicines	
 	
-		when adding medicines to a precsription
-		when buying new stock
+		when adding medicines to a precsription - Taken care of in application program
+		when buying new stock	- Not in scope of this assignment
 
 
 --Business constraints (possibly to be implemented in application program or via triggers)	
