@@ -1,0 +1,64 @@
++++ TASKS +++                    
+
+--Clean up load.sql                    
+	Update tables based on feedback from assign 2   Justin, Ella	DONE
+    	Add in NOT NULL etc. where needed            	Justin, Ella	DONE
+   	Enable/Disable Constraints where needed         Ella
+
+--Triggers for derived attributes
+
+	Maintian no_ of_employees attribute for clinic entity		Sam DONE
+		
+		when inserting or deleting a record in,
+		or updating the clinic_name attribute of the employee table 
+
+	Maintain stock level of prescribed medicines	
+	
+		when adding medicines to a precsription
+		when buying new stock
+
+
+--Business constraints (possibly to be implemented in application program or via triggers)	
+
+	assigned to (vet_ird)   
+		 Make sure that the vet_ird attribute in employee table is actually a vet            
+                
+	make sure each owner that is created has at least one animal associated with them and vis versa                
+                
+	make sure that an entry in city_pc table is created for each new postcode that is added to the database
+
+--Application Program
+
+Based around the idea of a vet running the program(s) during a consulation in order to create all the relevant entries in the database.
+
+
+Prompt user for name
+	in order to lookup thier employee ird to insert in the vet_ird attribute of consultation
+                
+Prompt for animal Id   
+	create new animal entry if needed            -Will be done by Sam
+    	create new owner entry if needed            
+
+Prompt for description                
+
+Prompt "Add prescription?"
+	
+	Create presciption 
+		generate prescription_num
+		prompt for instructions
+		Insert prescription (prescription_num, treament_slot (already generated above), vet_ird, instructions)
+		                
+	
+	Create prescribed_in entries
+
+		Prompt for medicine name, dosage, quantity   		
+			Insert prescribed_in (name, dosage, quantity, p_num) 		
+			Update medicine stock in medicine table
+		Prompt "Add another medicine?"
+			Repeat above steps if necessary
+
+Create consultation table entry
+	Insert treatment_slot, vet_ird, animal_id, description       
+
+Prompt consultation cost                
+	update owner account balance               
