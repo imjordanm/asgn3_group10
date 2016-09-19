@@ -28,19 +28,26 @@ public class ConsultApp {
 		//Connection con = null;
 		
 		
+		// Establish connection
+		// We can keep this connection open
+		// Make sure you close youe staement and resultset at the end of your method
+		// See vetIRD() for example on how to close staement and resultset
 		Connection con = createCon(user, pass, host);
 			
-		
+			
 			//USE THIS SECTION TO ADD YOUR QUERIES
 
-			// Query Vet IRD
+			// Get Vet name and create emplyees IRD query
 			String vetquery = getVetInfo();
-		
+			// Execute query
 			String vetird = vetIRD(vetquery, con);
 
 			System.out.print("VET IRD: ");
 			System.out.println(vetird);
 			
+			
+			
+			// Close connection
 			if (con != null) {
 				try {
 					con.close();
@@ -84,7 +91,7 @@ public class ConsultApp {
 		}
 		*/
 		return con;		
-	}
+	} // end createCon
 	
 	
 	// Ask user for first name and last name to retrieve Vet IRD
