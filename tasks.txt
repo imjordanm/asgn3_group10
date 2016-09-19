@@ -35,11 +35,11 @@ Classes:
 
 	Consultation: stores the relevant data to be added to the DB
 		include relevant mutator methods to add in the data for the relevant fields
-		include a method which outputs an SQL statement with all the relevant data
+		include an accessor  method which outputs an SQL statement with all the relevant data
 
-	Create a class for prescription
+	Create a class for prescription?
 
-	Create a class for prescribed_in	
+	Create a class for prescribed_in?	
 		
 
 Main Application class:
@@ -50,7 +50,7 @@ Prompt user for name
 	in order to lookup thier employee ird to insert in the vet_ird attribute of consultation - Justin
                 
 Prompt for animal Id   -Will be done by Sam
-	assume animal and owner already exist in database initally, 
+		assume animal and owner already exist in database initally, 
 		once that is working look at option of adding new animal/owner 
 
 Prompt for description                
@@ -72,10 +72,12 @@ Prompt "Add prescription?"
 		Prompt "Add another medicine?"
 			Repeat above steps if necessary
 
-Create consultation table entry
+Create consultation table entry in DB
 	
 	Use consulatation class to generate the insert statment
 	Insert treatment_slot, vet_ird, animal_id, description       
 
+Create presciption and prescribed_in entires in DB
+
 Prompt consultation cost                
-	update owner account balance
+	update owner account balance in DB
