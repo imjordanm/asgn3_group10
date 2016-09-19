@@ -33,7 +33,7 @@ Based around the idea of a vet running the program(s) during a consulation in or
 
 
 Prompt user for name
-	in order to lookup thier employee ird to insert in the vet_ird attribute of consultation
+	in order to lookup thier employee ird to insert in the vet_ird attribute of consultation - Justin
                 
 Prompt for animal Id   
 	create new animal entry if needed            -Will be done by Sam
