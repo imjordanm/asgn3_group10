@@ -39,9 +39,7 @@ public class ConsultApp {
 		//USE THIS SECTION TO ADD YOUR QUERIES
 		
 		// Query Vet IRD
-//		String vetird = getVetInfo(con);
 		String vetquery = getVetInfo();
-		//String command = new String();
 		String vetird = vetIRD(vetquery, con);
 		
 		System.out.print("VET IRD: ");
@@ -69,17 +67,17 @@ public class ConsultApp {
 		
 		// Get vet f_name and l_name from user input
 		Scanner scan = new Scanner(System.in);
-		System.out.print("First Name: ");	
+		System.out.print("Enter First Name: ");	
 		String fname = (scan.nextLine());
 		System.out.println();		
- 		System.out.print("Last Name: ");	
+ 		System.out.print("Enter Last Name: ");	
 		String lname = (scan.nextLine());
 		System.out.println();
 		
 		// Create SQL Query
 		String command = "SELECT ird FROM employees " +
-				"WHERE f_name = '" + fname +
-				"' AND l_name = '" + lname + "'";
+				"WHERE UPPER(f_name) = UPPER('" + fname +
+				"') AND UPPER(l_name) = UPPER('" + lname + "')";
 
 		System.out.println("SQL: " + command);
 		return command;
