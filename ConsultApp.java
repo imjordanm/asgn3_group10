@@ -25,32 +25,55 @@ public class ConsultApp {
 		String user = login.getUserName();
 		String pass = login.getPassWord();
 		String host = "silver";
-
-		Connection con = null;
-		try {
-			// Register the driver and connect to Oracle
-			DriverManager.registerDriver 
-				(new oracle.jdbc.driver.OracleDriver());
-			String url = "jdbc:oracle:thin:@" + host + ":1527:cosc344";
-			System.out.println("url: " + url);
-			con = DriverManager.getConnection(url, user, pass);
-			System.out.println("Connected to Oracle");
-
+		//Connection con = null;
+		
+		
+		Connection con = createCon(user, pass, host);
+			
+		
 			//USE THIS SECTION TO ADD YOUR QUERIES
 
 			// Query Vet IRD
 			String vetquery = getVetInfo();
+		
 			String vetird = vetIRD(vetquery, con);
 
 			System.out.print("VET IRD: ");
 			System.out.println(vetird);
+			
+			if (con != null) {
+				try {
+					con.close();
+				} catch (SQLException e) {
+					quit(e.getMessage());
+				}
+			}
 
 
+		
+	}  // end go()
+
+	
+	public Connection createCon(String user, String pass, String host) {
+		Connection con = null;
+		
+		try {
+		// Register the driver and connect to Oracle
+		DriverManager.registerDriver 
+		(new oracle.jdbc.driver.OracleDriver());
+		String url = "jdbc:oracle:thin:@" + host + ":1527:cosc344";
+		System.out.println("url: " + url);
+		con = DriverManager.getConnection(url, user, pass);
+		System.out.println("Connected to Oracle");
+		
+		
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
 			System.exit(1);
 
-		} finally {
+		} 
+		
+		/*finally {
 			if (con != null) {
 				try {
 					con.close();
@@ -59,8 +82,11 @@ public class ConsultApp {
 				}
 			}
 		}
-	}  // end go()
-
+		*/
+		return con;		
+	}
+	
+	
 	// Ask user for first name and last name to retrieve Vet IRD
 	// returns Sql Query to retireive ird
 	public String getVetInfo() {
