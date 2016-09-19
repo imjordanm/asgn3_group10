@@ -35,7 +35,7 @@ Classes:
 
 	Consultation: stores the relevant data to be added to the DB
 		include relevant mutator methods to add in the data for the relevant fields
-		include a method which outputs an SQL query with all the relevant data
+		include a method which outputs an SQL statement with all the relevant data
 
 	Create a class for prescription
 
@@ -57,21 +57,24 @@ Prompt for description
 
 Prompt "Add prescription?"
 	
-	Create presciption 
+	Create presciption - Use a class to store the data and genreate the SQL statement 
 		generate prescription_num
 		prompt for instructions
 		Insert prescription (prescription_num, treament_slot (already generated above), vet_ird, instructions)
 		                
-	
-	Create prescribed_in entries
+	Prompt for number of medicines - default 1 if a prescrition has been created
 
-		Prompt for medicine name, dosage, quantity   		
+	Create prescribed_in entries 
+
+		Prompt for medicine name, dosage, quantity 
 			Insert prescribed_in (name, dosage, quantity, p_num) 		
 			Update medicine stock in medicine table
 		Prompt "Add another medicine?"
 			Repeat above steps if necessary
 
 Create consultation table entry
+	
+	Use consulatation class to generate the insert statment
 	Insert treatment_slot, vet_ird, animal_id, description       
 
 Prompt consultation cost                
