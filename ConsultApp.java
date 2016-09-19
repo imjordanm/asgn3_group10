@@ -25,32 +25,62 @@ public class ConsultApp {
 		String user = login.getUserName();
 		String pass = login.getPassWord();
 		String host = "silver";
-
-		Connection con = null;
-		try {
-			// Register the driver and connect to Oracle
-			DriverManager.registerDriver 
-				(new oracle.jdbc.driver.OracleDriver());
-			String url = "jdbc:oracle:thin:@" + host + ":1527:cosc344";
-			System.out.println("url: " + url);
-			con = DriverManager.getConnection(url, user, pass);
-			System.out.println("Connected to Oracle");
-
+		//Connection con = null;
+		
+		
+		// Establish connection
+		// We can keep this connection open
+		// Make sure you close youe staement and resultset at the end of your method
+		// See vetIRD() for example on how to close staement and resultset
+		Connection con = createCon(user, pass, host);
+			
+			
 			//USE THIS SECTION TO ADD YOUR QUERIES
 
-			// Query Vet IRD
+			// Get Vet name and create emplyees IRD query
 			String vetquery = getVetInfo();
+			// Execute query
 			String vetird = vetIRD(vetquery, con);
 
 			System.out.print("VET IRD: ");
 			System.out.println(vetird);
+			
+			
+			
+			// Close connection
+			if (con != null) {
+				try {
+					con.close();
+				} catch (SQLException e) {
+					quit(e.getMessage());
+				}
+			}
 
 
+		
+	}  // end go()
+
+	
+	public Connection createCon(String user, String pass, String host) {
+		Connection con = null;
+		
+		try {
+		// Register the driver and connect to Oracle
+		DriverManager.registerDriver 
+		(new oracle.jdbc.driver.OracleDriver());
+		String url = "jdbc:oracle:thin:@" + host + ":1527:cosc344";
+		System.out.println("url: " + url);
+		con = DriverManager.getConnection(url, user, pass);
+		System.out.println("Connected to Oracle");
+		
+		
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
 			System.exit(1);
 
-		} finally {
+		} 
+		
+		/*finally {
 			if (con != null) {
 				try {
 					con.close();
@@ -59,8 +89,11 @@ public class ConsultApp {
 				}
 			}
 		}
-	}  // end go()
-
+		*/
+		return con;		
+	} // end createCon
+	
+	
 	// Ask user for first name and last name to retrieve Vet IRD
 	// returns Sql Query to retireive ird
 	public String getVetInfo() {
