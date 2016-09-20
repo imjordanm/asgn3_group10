@@ -34,17 +34,17 @@ public class ConsultApp {
 		// See vetIRD() for example on how to close staement and resultset
 		Connection con = createCon(user, pass, host);
 			
-			
+			ConsultData consult = new ConsultData();
 			//USE THIS SECTION TO ADD YOUR QUERIES
-
+			
 			// Get Vet name and create emplyees IRD query
 			String vetquery = getVetInfo();
 			// Execute query
 			String vetird = vetIRD(vetquery, con);
 
-			System.out.print("VET IRD: ");
-			System.out.println(vetird);
-			
+			//System.out.print("VET IRD: ");
+			//System.out.println(vetird);
+			consult.setVetIrd(vetird);				
 			
 			
 			// Close connection
