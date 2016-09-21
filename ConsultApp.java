@@ -1,7 +1,7 @@
 /*
-File: ConsultApp.java
-Justin Teare
-*/
+ * File: ConsultApp.java
+ * Justin Teare
+ */
 
 import java.io.*;
 import java.util.*;
@@ -25,27 +25,42 @@ public class ConsultApp {
 		String user = login.getUserName();
 		String pass = login.getPassWord();
 		String host = "silver";
-		//Connection con = null;
 		
-		
-		// Establish connection
-		// We can keep this connection open
-		// Make sure you close youe staement and resultset at the end of your method
-		// See vetIRD() for example on how to close staement and resultset
+		/*
+ 		 * Establish connection
+		 * We can keep this connection open
+		 * Make sure you close your statement and resultset at the end of your method
+		 * See vetIRD() for example on how to close statement and resultset 
+		 */
 		Connection con = createCon(user, pass, host);
 			
+			ConsultData consult = new ConsultData(); // Create consultation data object
 			
 			//USE THIS SECTION TO ADD YOUR QUERIES
 
-			// Get Vet name and create emplyees IRD query
-			String vetquery = getVetInfo();
-			// Execute query
-			String vetird = vetIRD(vetquery, con);
-
-			System.out.print("VET IRD: ");
-			System.out.println(vetird);
+			/*
+			 * timestamp testing
+			 */			
+			consult.setTimeslot(timeSlot());
+					
+			/*
+ 		 	 * vet_ird attribute
+			 * No error checking implemented yet
+			 */ 			
+			String vetquery = getVetInfo(); // prompt for name and generate query			
+			String vetird = vetIRD(vetquery, con); //execute query
+			consult.setVetIrd(vetird);				
+			
+			System.out.print("Stored vet_ird: ");
+			System.out.println(consult.getVetIrd());
 			
 			
+			//dummy data
+			consult.setAnimalID(123456);
+			consult.setDescription("test description");
+			
+			//add consult entry to DB
+			consult.insertConsult(con);
 			
 			// Close connection
 			if (con != null) {
@@ -93,6 +108,16 @@ public class ConsultApp {
 		return con;		
 	} // end createCon
 	
+	//Create timeslot entry using the current system date/time
+	public String timeSlot() {
+	
+		java.sql.Date sqlDate = new java.sql.Date(new java.util.Date().getTime());		
+		java.sql.Time sqlTime = new java.sql.Time(new java.util.Date().getTime());
+		System.out.println(sqlDate + " " + sqlTime);
+		
+		String outString = sqlDate + " " + sqlTime;
+		return outString;
+	}
 	
 	// Ask user for first name and last name to retrieve Vet IRD
 	// returns Sql Query to retireive ird
