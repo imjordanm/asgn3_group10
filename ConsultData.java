@@ -8,7 +8,6 @@ Justin Teare
 * Stores the data fields for consultation entry
 */
 
-
 import java.util.*;
 import java.sql.*;
 
@@ -23,8 +22,8 @@ public class ConsultData {
   	public ConsultData() { }
 	
 	/**sets the value of the data field timeslot to input parameter value*/
-  	public void setTimeslot(String timeslot){      
-    	this.timeslot = timeslot;      
+  	public void setTimeslot(String timeslot){
+            this.timeslot = timeslot;
   	}//end method
 
 	/**sets the value of vet_ird data field*/
@@ -63,6 +62,7 @@ public class ConsultData {
 			pstmt.setString(4, description);
 			
 			pstmt.executeUpdate();
+                        System.out.println("Consultation information:\nDate: " + timeslot + "\nVet: " + vet_ird + "\nAnimal: " + animal_id + "\nDescription: " + description);
 		}
 		catch (SQLException e ) {
 		quit(e.getMessage());
