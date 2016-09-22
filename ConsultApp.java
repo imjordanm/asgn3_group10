@@ -35,11 +35,11 @@ public class ConsultApp {
          */
         Connection con = createCon(user, pass, host);
 			
+        
+        // Create new consultation object
         ConsultData consult = new ConsultData(); // Create consultation data object
         System.out.println("Consultation information: ");
                         
-        //USE THIS SECTION TO ADD YOUR QUERIES
-
         /*
          * timestamp testing
          */			
@@ -70,24 +70,9 @@ public class ConsultApp {
         //add consult entry to DB
         consult.insertConsult(con);
 
+        prescribe(dateTime, vetird, con);
         
-        //Asks if the user wants to add a new prescription
-        //Jordan McCrae
-        System.out.println("\nAdd a prescription?");
-        Scanner scan = new Scanner(System.in);
-        System.out.print("Enter yes or no: ");	
-        String decision = (scan.nextLine());
-        //New prescription if user answers yes on prompt
-        if (decision.equalsIgnoreCase("yes") || decision.equalsIgnoreCase("y")) {
-            PrescriptionData prescription = new PrescriptionData();
-            //should the prescription number be randomly generated
-            //and then we test the existing prescription_nums for duplicates?
-            prescription.setPrescriptionNum(59931);
-            prescription.setInstructions(getInstructions());
-            prescription.setTreatmentSlot(dateTime);
-            prescription.setVetIRD(vetird);
-            prescription.insertPrescription(con);
-        }
+        
                         
         // Close connection
         if (con != null) {
@@ -217,7 +202,26 @@ public class ConsultApp {
 
     //Prescription methods
     // Jordan McCrae
-
+    
+    //Asks if the user wants to add a new prescription
+    //Jordan McCrae
+    public void prescribe(String dateTime, String vetird, Connection con) {
+        System.out.println("\nAdd a prescription?");
+        Scanner scan = new Scanner(System.in);
+        System.out.print("Enter yes or no: ");	
+        String decision = (scan.nextLine());
+        //New prescription if user answers yes on prompt
+        if (decision.equalsIgnoreCase("yes") || decision.equalsIgnoreCase("y")) {
+            PrescriptionData prescription = new PrescriptionData();
+            //should the prescription number be randomly generated
+            //and then we test the existing prescription_nums for duplicates?
+            prescription.setPrescriptionNum(59931);
+            prescription.setInstructions(getInstructions());
+            prescription.setTreatmentSlot(dateTime);
+            prescription.setVetIRD(vetird);
+            prescription.insertPrescription(con);
+		}
+	}
     /*public int getPrescription(){
           ---- add code here----
       }*/

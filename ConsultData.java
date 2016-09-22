@@ -32,7 +32,7 @@ public class ConsultData {
 	}//end method
 
 	/**set the value of animal_id datafield*/
-	public void setAnimalID (int Animal_id){
+	public void setAnimalID (int animal_id){
 		this.animal_id = animal_id;
 	}//end method
 	
