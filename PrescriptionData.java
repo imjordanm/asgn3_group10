@@ -21,10 +21,41 @@ public class PrescriptionData {
     //default constructor
     public PrescriptionData() { }
 	
+	
+//    /*sets the value of prescription_num data field*/
+//    public void setPrescriptionNum(int prescription_num){
+//        this.prescription_num = prescription_num;      
+//    }//end method
+    
     /**sets the value of prescription_num data field*/
-    public void setPrescriptionNum(int prescription_num){
-        this.prescription_num = prescription_num;      
+    public void setPrescriptionNum(Connection c){
+    	String command = "SELECT MAX(prescription_num) FROM prescription";
+    	Statement stmt = null;
+        ResultSet result = null;
+        int maxpnum = 0;
+        
+        try {
+            stmt = c.createStatement();
+            result = stmt.executeQuery(command);
+            result.next();
+            maxpnum = result.getInt(1);
+            //System.out.println(outString);
+        }
+        catch (SQLException e ) {
+            quit(e.getMessage());
+
+        } finally {
+            try {
+                if (stmt != null) { stmt.close(); }
+                result.close();
+            } catch (Exception e) {
+                System.out.println("Error in closing " + e.getMessage());
+            }
+        }	
+        prescription_num = maxpnum + 1; 
+        
     }//end method
+    
 
     /**sets the value of instructions data field*/
     public void setInstructions(String instructions){

@@ -215,7 +215,7 @@ public class ConsultApp {
             PrescriptionData prescription = new PrescriptionData();
             //should the prescription number be randomly generated
             //and then we test the existing prescription_nums for duplicates?
-            prescription.setPrescriptionNum(59931);
+            prescription.setPrescriptionNum(con);
             prescription.setInstructions(getInstructions());
             prescription.setTreatmentSlot(dateTime);
             prescription.setVetIRD(vetird);
