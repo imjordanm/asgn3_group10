@@ -9,7 +9,7 @@ public class PrescribedMed {
     private String dosage;
 	
     //default constructor
-    public PrescriptionData() { }
+    public PrescribedMed() { }
     
     /**sets the value of the data field quantity to input parameter value*/
   	public void setQuantity(int quantity){
