@@ -31,10 +31,39 @@ public class PrescribedMed {
 		this.dosage = dosage;
 	}
 	
+	/**retreive quantity prescribed*/	
 	public int getQuantity() {
 		return quantity
 	}
     
+
+	/**check remaining stock*/
+	public int checkStock(Connection c) {
+		String command = "SELECT stock FROM medicine "
+				+ "where name = ? and dosage = ?";
+		PreparedStatement pstmt = null;
+		ResultSet result = null;
+        	int stock = 0;
+        	try {
+            		pstmt = c.prepareStatement(command);
+			pstmt.setString(1, name);
+			pstmt.setString(2, dosage);
+			pstmt.executeQuery();		
+		}
+        	catch (SQLException e ) {
+            		quit(e.getMessage());
+        	} finally {
+            		try {
+                		if (pstmt != null) { pstmt.close(); }
+            		} catch (Exception e) {
+                		System.out.println("Error in closing " + e.getMessage());
+            		}
+        	}
+		return stock;
+	}
+
+
+	
 	/**create prescribed_in entry in database*/
 	public void insertMedicine(Connection c) {
 	
@@ -51,7 +80,10 @@ public class PrescribedMed {
 			pstmt.setString(4, dosage);
 			
 			pstmt.executeUpdate();
-                        System.out.println("Medicine information:\nQuantity: " + quantity + "\nPrescription number: " + p_num + "\nMedicine name: " + name + "\nDosage: " + dosage);
+                        System.out.println("Medicine information:\nQuantity: " 
+				+ quantity + "\nPrescription number: " 
+				+ p_num + "\nMedicine name: " 
+				+ name + "\nDosage: " + dosage);
 		}
 		catch (SQLException e ) {
 		quit(e.getMessage());
