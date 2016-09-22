@@ -78,6 +78,10 @@ public class PrescriptionData {
         return vet_ird;
     }
 
+    public int getPrescriptionNum(){
+        return prescription_num;
+    }
+
     /**create prescription entry in database*/
     public void insertPrescription(Connection c) {
 	
