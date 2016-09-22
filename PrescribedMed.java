@@ -30,6 +30,10 @@ public class PrescribedMed {
 	public void setDosage (String dosage){
 		this.dosage = dosage;
 	}
+	
+	public int getQuantity() {
+		return quantity
+	}
     
 	/**create prescribed_in entry in database*/
 	public void insertMedicine(Connection c) {
