@@ -35,15 +35,8 @@ public class ConsultApp {
          */
         Connection con = createCon(user, pass, host);
 			
-        
-        // Create new consultation object
         ConsultData consult = new ConsultData(); // Create consultation data object
-        System.out.println("Consultation information: ");
                         
-        /*
-         * timestamp testing
-         */			
-
         //datetime set as own string so consultation and prescription
         //(and whatever else) can use this to set their treatment slots
         //so the times are identical (setting prescription's timeslot
@@ -59,21 +52,20 @@ public class ConsultApp {
         String vetird = vetIRD(vetquery, con); //execute query
         consult.setVetIrd(vetird);				
 			
-        System.out.print("Vet IRD: ");
-        System.out.println(consult.getVetIrd());
-			
-			
+        //System.out.print("Vet IRD: ");
+        //System.out.println(consult.getVetIrd());
+						
         //dummy data
+        //to be completed by Sam
         consult.setAnimalID(123456);
+        
         consult.setDescription(getDescription());
 			
         //add consult entry to DB
         consult.insertConsult(con);
 
-        prescribe(dateTime, vetird, con);
-        
-        
-                        
+        prescribe(dateTime, vetird, con);      
+                              
         // Close connection
         if (con != null) {
             try {
@@ -81,8 +73,7 @@ public class ConsultApp {
             } catch (SQLException e) {
                 quit(e.getMessage());
             }
-        }
-		
+        }		
     }  // end go()
 
 	//Justin Teare
@@ -96,33 +87,19 @@ public class ConsultApp {
             String url = "jdbc:oracle:thin:@" + host + ":1527:cosc344";
             System.out.println("url: " + url);
             con = DriverManager.getConnection(url, user, pass);
-            System.out.println("Connected to Oracle");
-		
-		
+            System.out.println("Connected to Oracle");				
         } catch (SQLException e) {
             System.out.println(e.getMessage());
             System.exit(1);
-
         } 
-		
-        /*finally {
-          if (con != null) {
-          try {
-          con.close();
-          } catch (SQLException e) {
-          quit(e.getMessage());
-          }
-          }
-          }
-        */
         return con;		
     } // end createCon
 
 
     //Consultation methods
     
-    	//Create timeslot entry using the current system date/time
-    	// Jordan McCrae, Justin Teare
+    //Create timeslot entry using the current system date/time
+    // Jordan McCrae, Justin Teare
 	public String timeSlot() {
 	
         java.sql.Date sqlDate = new java.sql.Date(new java.util.Date().getTime());		
@@ -201,10 +178,8 @@ public class ConsultApp {
 
 
     //Prescription methods
-    // Jordan McCrae
-    
+    // Jordan McCrae    
     //Asks if the user wants to add a new prescription
-    //Jordan McCrae
     public void prescribe(String dateTime, String vetird, Connection con) {
         System.out.println("\nAdd a prescription?");
         Scanner scan = new Scanner(System.in);
@@ -226,13 +201,12 @@ public class ConsultApp {
           ---- add code here----
       }*/
 
-    public String getInstructions(){
-        // Get instructions for the prescription
+    // Get instructions for the prescription
+    public String getInstructions(){       
         Scanner scan = new Scanner(System.in);
         System.out.print("Instructions: ");	
         String instruct = (scan.nextLine());
-        System.out.println();
-        
+        System.out.println();        
         return instruct;
     }
     
