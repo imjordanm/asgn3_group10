@@ -7,7 +7,8 @@ public class PrescribedMed {
     private int p_num;
     private String name;
     private String dosage;
-	
+	private	int newstock;
+			
     //default constructor
     public PrescribedMed() { }
     
@@ -43,12 +44,14 @@ public class PrescribedMed {
 				+ "where name = ? and dosage = ?";
 		PreparedStatement pstmt = null;
 		ResultSet result = null;
-        	int stock = 0;
+        	int stock = 1;
         	try {
             		pstmt = c.prepareStatement(command);
 			pstmt.setString(1, name);
 			pstmt.setString(2, dosage);
-			pstmt.executeQuery();		
+			result = pstmt.executeQuery();
+			result.next();
+			stock = result.getInt(1);		
 		}
         	catch (SQLException e ) {
             		quit(e.getMessage());
@@ -95,6 +98,41 @@ public class PrescribedMed {
 			}
 		}
 	}
+
+	public void setNewStock(int newstock) {
+		this.newstock = newstock;
+	}	
+
+	public void updateStock(int newstock, Connection c) {
+		String command = "UPDATE medicine SET stock = ? WHERE name = ? AND dosage = ?";
+
+                PreparedStatement pstmt = null;
+		System.out.println("Newstock: " + newstock);
+                try {
+                        pstmt = c.prepareStatement(command);
+                        pstmt.setInt(1, newstock);
+                        pstmt.setString(2, name);
+                        pstmt.setString(3, dosage);
+
+                        pstmt.executeUpdate();
+                        /*System.out.println("Medicine information:\nQuantity: "
+                                + quantity + "\nPrescription number: "
+                                + p_num + "\nMedicine name: "
+                                + name + "\nDosage: " + dosage);*/
+                }
+                catch (SQLException e ) {
+                quit(e.getMessage());
+                } finally {
+                        try {
+                                if (pstmt != null) { pstmt.close(); }
+                        } catch (Exception e) {
+                                System.out.println("Error in closing " + e.getMessage());
+                        }
+                }
+
+		
+	}
+
 	// Used to output an error message and exit
 	private void quit(String message) {
 		System.err.println(message);

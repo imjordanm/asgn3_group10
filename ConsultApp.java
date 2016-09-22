@@ -233,9 +233,12 @@ public class ConsultApp {
             medicines[i].setName(getMedName());
             medicines[i].setDosage(getMedDosage());
 		int stock = medicines[i].checkStock(con);
-             medicines[i].setQuantity(getQuantity(stock));
+             medicines[i].setQuantity(getUserQuantity(stock));
+		int quan = medicines[i].getQuantity();
+		int newstock = getNewStock(stock, quan);
+		medicines[i].setNewStock(newstock);
 		medicines[i].insertMedicine(con);
-			
+		medicines[i].updateStock(newstock, con);			
             int x = i + 1;
             System.out.println("Medicine " + x + " added to database");
         }
@@ -249,7 +252,7 @@ public class ConsultApp {
     
     //Asks for input of medicine quantity
     //Jordan McRae
-    public int getQuantity(int stock){
+    public int getUserQuantity(int stock){
         //Prompt for quantity for each medicine
         System.out.println("Remaining stock: " + stock);
         System.out.println("\nQuantity of medicine:");
@@ -262,6 +265,10 @@ public class ConsultApp {
         return quantityMed;
     }
 
+	public int getNewStock(int stock, int quan) {
+		int newstock = stock - quan;
+		return newstock;	
+	}
     //Asks for medicine name
     //Jordan McRae
     public String getMedName(){
