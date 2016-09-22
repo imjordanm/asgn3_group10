@@ -14,6 +14,8 @@ import java.sql.*;
 
 public class ConsultApp {
 
+    public int p_num;
+
     public static void main (String[] args) {
         new ConsultApp().go();
     }
@@ -64,8 +66,25 @@ public class ConsultApp {
         //add consult entry to DB
         consult.insertConsult(con);
 
-        prescribe(dateTime, vetird, con);      
-                              
+        //Prompt to add new prescription, if yes calls prescribe method
+        System.out.println("\nAdd a prescription?");
+        Scanner scan = new Scanner(System.in);
+        System.out.print("Enter yes or no: ");	
+        String decision = (scan.nextLine());
+        //New prescription if user answers yes on prompt
+        if (decision.equalsIgnoreCase("yes") || decision.equalsIgnoreCase("y")) {
+            prescribe(dateTime, vetird, con);
+
+            //Prompt for the number of medicines
+            System.out.println("\nNumber of medicines (1-5):");
+            int numMeds = (scan.nextInt());
+            while (numMeds > 5) {
+                System.out.println("Number of medicines exceeds 5, please enter again");
+                numMeds = (scan.nextInt());
+            }
+            prescribedIn(p_num, numMeds, con);
+        }
+        
         // Close connection
         if (con != null) {
             try {
@@ -76,8 +95,8 @@ public class ConsultApp {
         }		
     }  // end go()
 
-	//Justin Teare
-	public Connection createCon(String user, String pass, String host) {
+    //Justin Teare
+    public Connection createCon(String user, String pass, String host) {
         Connection con = null;
 		
         try {
@@ -99,8 +118,8 @@ public class ConsultApp {
     //Consultation methods
     
     //Create timeslot entry using the current system date/time
-    // Jordan McCrae, Justin Teare
-	public String timeSlot() {
+    // Jordan McRae, Justin Teare
+    public String timeSlot() {
 	
         java.sql.Date sqlDate = new java.sql.Date(new java.util.Date().getTime());		
         java.sql.Time sqlTime = new java.sql.Time(new java.util.Date().getTime());
@@ -181,27 +200,19 @@ public class ConsultApp {
     // Jordan McCrae    
     //Asks if the user wants to add a new prescription
     public void prescribe(String dateTime, String vetird, Connection con) {
-        System.out.println("\nAdd a prescription?");
-        Scanner scan = new Scanner(System.in);
-        System.out.print("Enter yes or no: ");	
-        String decision = (scan.nextLine());
-        //New prescription if user answers yes on prompt
-        if (decision.equalsIgnoreCase("yes") || decision.equalsIgnoreCase("y")) {
-            PrescriptionData prescription = new PrescriptionData();
-            //should the prescription number be randomly generated
-            //and then we test the existing prescription_nums for duplicates?
-            prescription.setPrescriptionNum(con);
-            prescription.setInstructions(getInstructions());
-            prescription.setTreatmentSlot(dateTime);
-            prescription.setVetIRD(vetird);
-            prescription.insertPrescription(con);
-		}
-	}
-    /*public int getPrescription(){
-          ---- add code here----
-      }*/
+        PrescriptionData prescription = new PrescriptionData();
+        prescription.setPrescriptionNum(con);
+        prescription.setInstructions(getInstructions());
+        prescription.setTreatmentSlot(dateTime);
+        prescription.setVetIRD(vetird);
+        prescription.insertPrescription(con);
+
+        p_num = prescription.getPrescriptionNum();     
+        prescriptionNum(p_num);
+    }
 
     // Get instructions for the prescription
+    //Jordan McRae
     public String getInstructions(){       
         Scanner scan = new Scanner(System.in);
         System.out.print("Instructions: ");	
@@ -209,7 +220,72 @@ public class ConsultApp {
         System.out.println();        
         return instruct;
     }
+
+    //PrescribedIn methods
+    //Jordan McRae
+    public void prescribedIn(int p_num, int numMeds, Connection con) {
+        // PrescribedData prescribedIn = new PrescribedData();
+        PrescribedMed[] medicines = new PrescribedMed[numMeds];
+        for (int i = 0; i < medicines.length; i++) {
+            medicines[i] = new PrescribedMed();
+
+            medicines[i].setP_num(p_num);
+            medicines[i].setName(getMedName());
+            medicines[i].setDosage(getMedDosage());
+		int stock = medicines[i].checkStock(con);
+             medicines[i].setQuantity(getQuantity(stock));
+		medicines[i].insertMedicine(con);
+			
+            int x = i + 1;
+            System.out.println("Medicine " + x + " added to database");
+        }
+    }
+
+    public int prescriptionNum(int p_num) {
+        this.p_num = p_num;
+        return p_num;
+    }
+
     
+    //Asks for input of medicine quantity
+    //Jordan McRae
+    public int getQuantity(int stock){
+        //Prompt for quantity for each medicine
+        System.out.println("Remaining stock: " + stock);
+        System.out.println("\nQuantity of medicine:");
+        Scanner scan = new Scanner(System.in);
+        int quantityMed = (scan.nextInt());
+	while (quantityMed > stock) {
+		System.out.println("Quantity must be less than stock");
+		quantityMed = (scan.nextInt());
+	}
+        return quantityMed;
+    }
+
+    //Asks for medicine name
+    //Jordan McRae
+    public String getMedName(){
+        //Prompt for name of medicine
+        System.out.println("\nMedicine Name:");
+        Scanner scan = new Scanner(System.in);
+        String nameMed = (scan.nextLine());
+        
+        return nameMed;
+    }
+
+    //Asks for medDosage
+    //Jordan McRae
+    public String getMedDosage(){
+        //Prompt for dosage of medicine
+        System.out.println("\nDosage:");
+        Scanner scan = new Scanner(System.in);
+        String dosageMed = (scan.nextLine());
+        System.out.println();
+        
+        return dosageMed;
+    }
+    
+
     // Used to output an error message and exit
     private void quit(String message) {
         System.err.println(message);
