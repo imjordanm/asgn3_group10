@@ -1,6 +1,6 @@
 /*
-File: ConsultData.java
-Justin Teare
+*File: ConsultData.java
+*Justin Teare
 */
 
 /** 

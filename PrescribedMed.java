@@ -1,3 +1,14 @@
+/*
+*File: ConsultData.java
+*Mutator methods Luyi Qi
+*checkstock(), insertMedicine(), setNewStock() Justin Teare and Jordan McCrae
+*/
+
+/** 
+* Support Class ConsultData
+* Stores the data fields for consultation entry
+*/
+
 import java.util.*;
 import java.sql.*;
 
@@ -38,7 +49,11 @@ public class PrescribedMed {
 	}
     
 
-	/**check remaining stock*/
+	/**check remaining stock
+	*Query stock level of medicine
+	*Takes Connection object as input
+	*Returns int
+	*/
 	public int checkStock(Connection c) {
 		String command = "SELECT stock FROM medicine "
 				+ "where name = ? and dosage = ?";
@@ -67,7 +82,9 @@ public class PrescribedMed {
 
 
 	
-	/**create prescribed_in entry in database*/
+	/**Create prescribed_in entry in database
+	*Takes connection object as input
+	*/
 	public void insertMedicine(Connection c) {
 	
 		String command = "INSERT INTO prescribed_in "
@@ -103,6 +120,10 @@ public class PrescribedMed {
 		this.newstock = newstock;
 	}	
 
+	/**Update stock level in medicines table
+	*takes new stock level and connection object as input
+	*/
+	
 	public void updateStock(int newstock, Connection c) {
 		String command = "UPDATE medicine SET stock = ? WHERE name = ? AND dosage = ?";
 

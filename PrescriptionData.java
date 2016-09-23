@@ -1,6 +1,7 @@
 /*
-  File: PrescriptionData.java
-  Jordan McRae
+*File: PrescriptionData.java
+* Jordan McRae
+* setPrescriptionNum() Justin Teare
 */
 
 /** 
