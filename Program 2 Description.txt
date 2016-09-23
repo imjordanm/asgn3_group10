@@ -16,4 +16,4 @@ The user is then asked if a prescription will be added to the consultation. If a
 
 - Create entries in the prescribed_in table and and modify the medicines table when the user adds medicines to the prescription.
 
-The user is asked how many medicines are to be added to the prescription. For each medicine the user is then prompted to enter in the medicine name, dosage, quantity, and instructions for that medicine. The previously generated prescription number is also added to the entry in the prescribed_in table. For each medicine the quantity prescribed is subtracted from stock attribute in the medicines table.
+The user is asked how many medicines are to be added to the prescription. For each medicine the user is then prompted to enter in the medicine name, dosage, and quantity prescribed. The previously generated prescription number is also added to the entry in the prescribed_in table. For each medicine the quantity prescribed is subtracted from stock attribute in the medicines table.
