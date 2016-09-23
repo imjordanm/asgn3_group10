@@ -1,0 +1,19 @@
+Program 2
+
+Consultation management application for the vet clinic database
+
+The purpose of this application is to manage the entry of data into the database relevant to a veterinary consultation. During a consultation, the attending vet runs the application and follows prompts to enter in data which is then used to populate and modify relevant tables and entries in the database. Several tables need to queried and updated to store the relevant data, and some tables may or not need to be updated depending on decisions made by the user. This application encapsulates all the contingencies for the recording of data required to represent a consultation in the database.
+
+The main database actions performed by this program are:
+
+- Create an entry in the consultation table.
+
+When the application is run, the system time is used to generate the treatment_slot attribute. The user is then prompted for their first and last names, which are used by the program to look up their IRD number for entry into the vet_ird attribute. Further prompts allow the user to enter in the animal ID of the animal and a short description of the consultation to complete the creation of the consultation data which is then inserted into the consultation table.
+
+- Create an entry in the prescription table.
+
+The user is then asked if a prescription will be added to the consultation. If a prescription is needed the previously determined treatment_slot and vet_ird values are used along with a prescription number and description to populate the entry for the prescription table. The application generates a new prescription number and prompts the user to enter a description .
+
+- Create entries in the prescribed_in table and and modify the medicines table when the user adds medicines to the prescription.
+
+The user is asked how many medicines are to be added to the prescription. For each medicine the user is then prompted to enter in the medicine name, dosage, quantity, and instructions for that medicine. The previously generated prescription number is also added to the entry in the prescribed_in table. For each medicine the quantity prescribed is subtracted from stock attribute in the medicines table.
