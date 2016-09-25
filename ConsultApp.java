@@ -29,37 +29,23 @@ public class ConsultApp {
         String pass = login.getPassWord();
         String host = "silver";
 
-        /*
-         * Establish connection
-         * We can keep this connection open
-         * Make sure you close your statement and resultset at the end of your method
-         * See vetIRD() for example on how to close statement and resultset 
-         */
+        //Establish connection
         Connection con = createCon(user, pass, host);
 
+        //Create consultation data object using ConsultData support class
         ConsultData consult = new ConsultData(); // Create consultation data object
                
-        /*
-         *datetime set as own string so consultation and prescription
-         *(and whatever else) can use this to set their treatment slots
-         *so the times are identical (setting prescription's timeslot
-         *would be seconds or minutes off from consultations).
-         */
         String dateTime = timeSlot();
-        consult.setTimeslot(dateTime); // Store timeslot in consultation object
+              
         //Heading for the Pet Clinic application
         System.out.println("\nPet Clinic Consultation and Prescription Entry\n"); 
 
-        /*
-         * vet_ird attribute
-         * No check to make sure user is a vet implemented
-         */ 			
-        //String vetquery = getVetInfo(); // prompt for name and generate query			
-        
+        // Store consultation object data fields
+        consult.setTimeslot(dateTime); 	       
         String vetird = null;
-        vetird = vetIRD(con); //execute query
-        
+        vetird = vetIRD(con);      
         String position = posCheck(vetird, con); //check employee position
+		
 		while(!position.equals("vet")) {
 			System.out.println("Not a vet");
 			vetird = vetIRD(con);
@@ -70,7 +56,6 @@ public class ConsultApp {
         consult.setAnimalID(getAnimalID());
         consult.setOwnerID(con);
         consult.setDescription(getDescription()); // Prompt user for description
-		
         double cost = 100.00;
         consult.setCost(cost);			
         // Insert consult entry in DB
@@ -81,17 +66,29 @@ public class ConsultApp {
         Scanner scan = new Scanner(System.in);
         System.out.print("Enter yes or no: ");	
         String decision = (scan.nextLine());
+        
         //New prescription if user answers yes on prompt
         if (decision.equalsIgnoreCase("yes") || decision.equalsIgnoreCase("y")) {
             prescribe(dateTime, vetird, con);
-
+            
             //Prompt for the number of medicines
             System.out.println("\nNumber of medicines (1-5):");
-            int numMeds = (scan.nextInt());
-            while (numMeds > 5) {
-                System.out.println("Number of medicines exceeds 5, please enter again");
-                numMeds = (scan.nextInt());
-            }
+            int numMeds = 0;
+            boolean error = true;
+            do {
+                try {
+                    numMeds = (scan.nextInt());
+                    if (numMeds > 5) {
+                        System.err.println("Error: Number of medicines exceeds 5, please retry (1-5):");
+                        scan.nextLine();
+                    } else {
+                        error = false;
+                    }
+                } catch (Exception e) {
+                    System.err.println("Error: Please enter number of medicines as a digit (1-5):");
+                    scan.nextLine();
+                }
+            } while (error);
             prescribedIn(p_num, numMeds, con); // Create prescribed_in entry for medicine in DB 
         }
 
@@ -144,31 +141,8 @@ public class ConsultApp {
         return outString;
     }
 
-    /**  
-     * Ask user for first name and last name to retrieve Vet IRD
-     * Returns Sql Query to retrieve ird as a string
-     * Justin Teare
-     */
-    public String getVetInfo() {
-
-        // Get vet f_name and l_name from user input
-        Scanner scan = new Scanner(System.in);
-        System.out.print("Vet First Name: ");	
-        String fname = (scan.nextLine());		
-        System.out.print("Vet Last Name: ");	
-        String lname = (scan.nextLine());
-
-        // Create SQL Query
-        String command = "SELECT ird FROM employees " +
-            "WHERE UPPER(f_name) = UPPER('" + fname +
-            "') AND UPPER(l_name) = UPPER('" + lname + "')";
-        return command;
-    } // end getVetInfo()
-
-
     /** 
-	 * Runs the query from getVetInfo
-	 * Takes query as string and connection object as input
+	 * Takes connection object as input
 	 * Returns vet IRD as string
 	 * Justin Teare
 	 */
@@ -197,7 +171,7 @@ public class ConsultApp {
 			result = pstmt.executeQuery();
 			
 			
-			result.next();
+			//result.next();
 			
 			while(!result.next()) {
 				result.close();
@@ -299,11 +273,10 @@ public class ConsultApp {
         prescriptionNum(p_num);
     }//end prescribe
 
-    /**
-     *Get instructions for the prescription
-     *Asks user to input instructions
-     *Returns instructions as string
-     *Jordan McRae
+   /**
+     * Asks user to input instructions for the prescription
+     * Returns instructions as string
+     * Jordan McRae
      */
     public String getInstructions(){       
         Scanner scan = new Scanner(System.in);
@@ -313,8 +286,10 @@ public class ConsultApp {
         return instruct;
     }//end getInstructions
 
-    // Sets data field for prescription number to make it accesible
-    // Takes int, returns int
+    /**
+     * Sets data field for prescription number to make it accesible
+     * Takes int, returns int
+     */
     public int prescriptionNum(int p_num) {
         this.p_num = p_num;
         return p_num;
@@ -366,6 +341,11 @@ public class ConsultApp {
         return quantityMed;
     }
 
+    /**
+     * Takes the current stock and the quantity input as parameters
+     * Subtracts the quantity from stock to calculate new stock
+     * Takes int, returns int
+     */
     public int getNewStock(int stock, int quan) {
         int newstock = stock - quan;
         return newstock;	
