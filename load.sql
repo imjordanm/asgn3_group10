@@ -1,110 +1,167 @@
-DROP TABLE prescribed_in;
-DROP TABLE medicine;
-DROP TABLE prescription;
-DROP TABLE consultation;
---DROP TABLE manages;
-DROP TABLE animal;
-DROP TABLE owner;
-DROP TABLE employees CASCADE CONSTRAINTS;
-DROP TABLE clinic;
-DROP TABLE city_pc;
+SET SERVEROUTPUT ON
+
+DROP TRIGGER tr_emp_num;
+DROP TRIGGER trg_anim;
+DROP TRIGGER trg_billing;
+
+DROP TABLE prescribed_in cascade constraints;
+DROP TABLE medicine cascade constraints;
+DROP TABLE prescription cascade constraints;
+DROP TABLE consultation cascade constraints;
+DROP TABLE animal cascade constraints;
+DROP TABLE owner cascade constraints;
+DROP TABLE employees cascade constraints;
+DROP TABLE clinic cascade constraints;
+DROP TABLE city_pc cascade constraints;
 
 CREATE TABLE city_pc
 (city   VARCHAR2(30) NOT NULL,
 postcode  VARCHAR2(4) NOT NULL PRIMARY KEY);
 
 CREATE TABLE clinic
-(name       	VARCHAR2(30)  NOT NULL  PRIMARY KEY,
-st_num         	VARCHAR2(5)   NOT NULL,
-st_name     	VARCHAR2(30)  NOT NULL,
-suburb      	VARCHAR2(30)  NOT NULL,
-postcode   	VARCHAR2(4)   NOT NULL,
-phone_num   	VARCHAR2(10)  NOT NULL,
-fax_num     	VARCHAR2(20),
+(name           VARCHAR2(30)  NOT NULL  PRIMARY KEY,
+st_num          VARCHAR2(5)   NOT NULL,
+st_name         VARCHAR2(30)  NOT NULL,
+suburb          VARCHAR2(30)  NOT NULL,
+postcode        VARCHAR2(4)   NOT NULL,
+phone_num       VARCHAR2(10)  NOT NULL,
+fax_num         VARCHAR2(20),
 no_of_employees INT NOT NULL,
-mgr_ird     	VARCHAR(10)   NOT NULL,
-start_date	DATE 	      NOT NULL);
+mgr_ird         VARCHAR(10)   NOT NULL,
+start_date      DATE          NOT NULL);
 
 CREATE TABLE employees
-(ird    	VARCHAR2(10)   NOT NULL PRIMARY KEY,
-f_name  	VARCHAR2(30)  NOT NULL,
-m_init  	CHAR,
-l_name  	VARCHAR2(30)  NOT NULL,
-st_num  	VARCHAR2(5)   NOT NULL,
-st_name 	VARCHAR2(30)  NOT NULL,
-suburb  	VARCHAR2(30)  NOT NULL,
-postcode  	VARCHAR2(4)   NOT NULL,
-position	VARCHAR(13) CHECK(position IN ('vet','vet nurse','administrator')) NOT NULL,
-vet_ird 	VARCHAR2(10),
-salary  	FLOAT         NOT NULL,
+(ird            VARCHAR2(10)   NOT NULL PRIMARY KEY,
+f_name          VARCHAR2(30)  NOT NULL,
+m_init          CHAR,
+l_name          VARCHAR2(30)  NOT NULL,
+st_num          VARCHAR2(5)   NOT NULL,
+st_name         VARCHAR2(30)  NOT NULL,
+suburb          VARCHAR2(30)  NOT NULL,
+postcode        VARCHAR2(4)   NOT NULL,
+position        VARCHAR(13) CHECK(position IN ('vet','vet nurse','administrator')) NOT NULL,
+vet_ird         VARCHAR2(10),
+salary          FLOAT         NOT NULL,
 clinic_name VARCHAR2(30)      NOT NULL,
-CONSTRAINT FK_asn_vet_ird 	FOREIGN KEY (vet_ird) 	REFERENCES employees(ird) DISABLE,
-CONSTRAINT FK_clinic_name FOREIGN KEY (clinic_name) REFERENCES clinic(name) DISABLE);
-
-ALTER TABLE clinic ADD CONSTRAINT FK_mgr_ird FOREIGN KEY (mgr_ird) REFERENCES employees(ird) DISABLE;
-
-/*
-CREATE TABLE manages
-(mgr_ird	VARCHAR2(10),
-name    	VARCHAR2(30),
-start_date  DATE,
-CONSTRAINT FK_mgr_ird_cnst FOREIGN KEY (mgr_ird) REFERENCES employees(ird) DISABLE);
-*/
+CONSTRAINT FK_asn_vet_ird       FOREIGN KEY (vet_ird)   REFERENCES employees(ird) ENABLE,
+CONSTRAINT FK_clinic_name FOREIGN KEY (clinic_name) REFERENCES clinic(name) ENABLE);
 
 CREATE TABLE owner
-(owner_id   	VARCHAR(10)  NOT NULL PRIMARY KEY,
-f_name      	VARCHAR2(30) NOT NULL,
-m_init      	VARCHAR2(3),
-l_name      	VARCHAR2(30) NOT NULL,
+(owner_id       VARCHAR(10)  NOT NULL PRIMARY KEY,
+f_name          VARCHAR2(30) NOT NULL,
+m_init          VARCHAR2(3),
+l_name          VARCHAR2(30) NOT NULL,
 date_of_birth   DATE         NOT NULL,
-st_num      	VARCHAR2(5)  NOT NULL,
-st_name     	VARCHAR2(30) NOT NULL,
-suburb      	VARCHAR2(30) NOT NULL,
-postcode   	 VARCHAR2(4) NOT NULL,
+st_num          VARCHAR2(5)  NOT NULL,
+st_name         VARCHAR2(30) NOT NULL,
+suburb          VARCHAR2(30) NOT NULL,
+postcode         VARCHAR2(4) NOT NULL,
 account_balance FLOAT,
-phone_num   	VARCHAR2(10));
+phone_num       VARCHAR2(10));
 
 CREATE TABLE animal
-(animal_id INT NOT NULL PRIMARY KEY,
-name   	VARCHAR2(30),
-sex    	CHAR NOT NULL,
-species	VARCHAR2(30),
-age    	INT,
+(animal_id VARCHAR2(20) PRIMARY KEY, --changed from 30 to 20
+name    VARCHAR2(30),
+sex     CHAR NOT NULL,
+species VARCHAR2(30),
+age     INT,
 owner_id   VARCHAR(10) NOT NULL,
-CONSTRAINT FK_owner_id FOREIGN KEY (owner_id) REFERENCES owner(owner_id) DISABLE);
+CONSTRAINT FK_owner_id FOREIGN KEY (owner_id) REFERENCES owner(owner_id) ENABLE);
 
 --Combined treatment_slot, treatment_date into one atrribute
 CREATE TABLE consultation
 (treatment_slot   DATE NOT NULL,
-vet_ird       	VARCHAR2(10) NOT NULL,
-animal_ID     	INT NOT NULL,
-description   	VARCHAR(256),
-CONSTRAINT FK_animal_id	FOREIGN KEY (animal_id) REFERENCES animal(Animal_ID) DISABLE,
-CONSTRAINT FK_vet_ird  	FOREIGN KEY (vet_ird)   REFERENCES employees(ird) DISABLE,
-CONSTRAINT PK_consultation PRIMARY KEY (treatment_slot, vet_ird) DISABLE);
+vet_ird         VARCHAR2(10) NOT NULL,
+animal_id       VARCHAR(20) NOT NULL, --changed from 30 to 20
+owner_id        VARCHAR(20),  --added, since we might have strays I have it not as NOT NULL
+description     VARCHAR(256),
+billing         FLOAT,  --added
+CONSTRAINT FK_animal_id FOREIGN KEY (animal_id) REFERENCES animal(animal_id) ENABLE,
+CONSTRAINT FK_vet_ird   FOREIGN KEY (vet_ird)   REFERENCES employees(ird) ENABLE,
+CONSTRAINT FK_payee     FOREIGN KEY (owner_id) REFERENCES owner(owner_id) ENABLE,
+CONSTRAINT PK_consultation PRIMARY KEY (treatment_slot, vet_ird) ENABLE);
 
 
 CREATE TABLE prescription
 (prescription_num   INT NOT NULL PRIMARY KEY,
-instructions    	VARCHAR(256) NOT NULL,
-treatment_slot  	DATE NOT NULL,
-vet_ird         	VARCHAR(10) NOT NULL,
-CONSTRAINT FK_vet_slot FOREIGN KEY (treatment_slot,vet_ird) REFERENCES consultation(treatment_slot,vet_ird) DISABLE);
+instructions            VARCHAR(256) NOT NULL,
+treatment_slot          DATE NOT NULL,
+vet_ird                 VARCHAR(10) NOT NULL,
+CONSTRAINT FK_vet_slot FOREIGN KEY (vet_ird,treatment_slot) REFERENCES consultation(vet_ird,treatment_slot) ENABLE);
 
 CREATE TABLE medicine
-(name	VARCHAR(128) NOT NULL,
+(name   VARCHAR(128) NOT NULL,
 dosage VARCHAR2(30) NOT NULL,
-stock 	INT NOT NULL,
-CONSTRAINT PK_medicine PRIMARY KEY (name, dosage) DISABLE);
+stock   INT NOT NULL,
+CONSTRAINT PK_medicine PRIMARY KEY (name, dosage) ENABLE);
 
 CREATE TABLE prescribed_in
 (quantity   INT NOT NULL,
-p_num  	INT NOT NULL,
+p_num   INT NOT NULL,
 name   VARCHAR2(128) NOT NULL,
-dosage 	VARCHAR2(30) NOT NULL,
-CONSTRAINT FK_p_num FOREIGN KEY (p_num) REFERENCES prescription(prescription_num) DISABLE,
-CONSTRAINT FK_medicine FOREIGN KEY (name,dosage) REFERENCES medicine(name,dosage) DISABLE,
-CONSTRAINT PK_prescribed_in PRIMARY KEY (p_num,name,dosage) DISABLE);
+dosage  VARCHAR2(30) NOT NULL,
+CONSTRAINT FK_p_num FOREIGN KEY (p_num) REFERENCES prescription(prescription_num) ENABLE,
+CONSTRAINT FK_medicine FOREIGN KEY (name,dosage) REFERENCES medicine(name,dosage) ENABLE,
+CONSTRAINT PK_prescribed_in PRIMARY KEY (p_num,name,dosage) ENABLE);
+
+/* TRIGGERS */
+
+CREATE OR REPLACE TRIGGER tr_emp_num
+       AFTER INSERT OR DELETE OR UPDATE ON employees
+             BEGIN
+                --Dunedin
+                UPDATE clinic SET no_of_employees
+                = (SELECT count(*) FROM employees
+                WHERE clinic_name='Pet Clinic Dunedin')
+                WHERE name='Pet Clinic Dunedin';
+
+                --Christchurch
+                UPDATE clinic SET no_of_employees
+                = (SELECT count(*) FROM employees
+                WHERE clinic_name='Pet Clinic Christchurch')
+                WHERE name='Pet Clinic Christchurch';
+
+                --Auckland
+                UPDATE clinic SET no_of_employees
+                = (SELECT count(*) FROM employees
+                WHERE clinic_name='Pet Clinic Auckland')
+                WHERE name='Pet Clinic Auckland';
+
+
+              END;
+/
+CREATE OR REPLACE TRIGGER trg_anim
+BEFORE INSERT OR UPDATE OF animal_id ON animal
+FOR EACH ROW
+WHEN (NEW.animal_id IS NULL)
+DECLARE n_seed VARCHAR2(100);
+BEGIN
+n_seed := TO_CHAR(SYSTIMESTAMP,'YYYYDDMMHH24MISSFFFF');
+DBMS_RANDOM.seed(val=>n_seed);
+IF :NEW.animal_id IS NULL THEN
+n_seed := DBMS_RANDOM.value(0,99);
+n_seed := substr(n_seed,4,5);
+:New.animal_id := n_seed;
+END IF;
+END;
+/
+
+CREATE OR REPLACE TRIGGER trg_billing
+AFTER INSERT OR UPDATE OF billing ON consultation
+FOR EACH ROW
+DECLARE diff FLOAT;
+BEGIN
+IF INSERTING THEN
+UPDATE owner
+SET owner.account_balance = owner.account_balance + :NEW.billing WHERE owner.owner_id = :NEW.owner_id;
+ELSIF UPDATING THEN
+diff := :NEW.billing - :OLD.billing;
+UPDATE owner
+SET owner.account_balance = owner.account_balance + diff WHERE owner.owner_id = :NEW.owner_id;
+END IF;
+END;
+/
+
 
 /* CLINICS */
 
@@ -133,7 +190,7 @@ INSERT INTO employees VALUES
 ('33-345-699', 'Eva', 'P', 'Lobb', '86', 'Drivers Rd.', 'Maori Hill', '9010', 'vet nurse', '52-385-949', 48000, 'Pet Clinic Dunedin');
 
 INSERT INTO employees VALUES
-('73-378-229', 'Rebecca', 'G', 'Johnson', '21', 'Prestwick St.', 'Maori Hill', '9010', 'administrator', 'NULL', 52000, 'Pet Clinic Dunedin');
+('73-378-229', 'Rebecca', 'G', 'Johnson', '21', 'Prestwick St.', 'Maori Hill', '9010', 'administrator', NULL, 52000, 'Pet Clinic Dunedin');
 
 /* Employees for Pet Clinic Auckland
 2 vets, 2 nurses, 1 Administrator
@@ -152,7 +209,7 @@ INSERT INTO employees VALUES
 ('67-545-679', 'Graham', 'P', 'Fraser', '15', 'Crummer Rd', 'Grey Lynn', '1021', 'vet nurse', '88-855-987', 48000, 'Pet Clinic Auckland');
 
 INSERT INTO employees VALUES
-('45-678-765', 'Jason', 'G', 'Samuels', '10', 'Long Dr', 'St Heliers', '1071', 'administrator', 'NULL', 52000, 'Pet Clinic Auckland');
+('45-678-765', 'Jason', 'G', 'Samuels', '10', 'Long Dr', 'St Heliers', '1071', 'administrator', NULL, 52000, 'Pet Clinic Auckland');
 
 
 /* Employees for Pet Clinic Christchurch
@@ -172,20 +229,10 @@ INSERT INTO employees VALUES
 ('89-672-361', 'Josh', 'W', 'Black', '20', 'Steadman Rd', 'Broomfield', '8042', 'vet nurse', '23-456-369', 48000, 'Pet Clinic Christchurch');
 
 INSERT INTO employees VALUES
-('46-382-759', 'Samantha', 'R', 'Preston', '13', 'Rocking Horse Rd', 'Southshore', '8062', 'administrator', 'NULL', 52000, 'Pet Clinic Christchurch');
+('46-382-759', 'Samantha', 'R', 'Preston', '13', 'Rocking Horse Rd', 'Southshore', '8062', 'administrator', NULL, 52000, 'Pet Clinic Christchurch');
 
+ALTER TABLE clinic ADD CONSTRAINT FK_mgr_ird FOREIGN KEY (mgr_ird) REFERENCES employees(ird) ENABLE;
 
-
-/* Manages */
-
-/*
-INSERT INTO manages VALUES
-('73-378-229','Pet Clinic Dunedin',TO_DATE('21-11-2012', 'dd-mm-yyyy'));
-INSERT INTO manages VALUES
-('45-678-765','Pet Clinic Auckland',TO_DATE('15-08-2014', 'dd-mm-yyyy'));
-INSERT INTO manages VALUES
-('46-382-759','Pet Clinic Christchurch',TO_DATE('13-12-2013', 'dd-mm-yyyy'));
-*/
 
 /* Owners */
 
@@ -211,29 +258,29 @@ INSERT INTO owner VALUES
 /* Animals */
 
 INSERT INTO animal VALUES
-(1234567890, 'Mrs. Fluffington III','F','Cat',5,'48-389-639');
+('1234567890', 'Mrs. Fluffington III','F','Cat',5,'48-389-639');
 INSERT INTO animal VALUES
-(543210987654321,'Herbert','O','Axolotl',2,'58-002-629');
+('543210987654321','Herbert','O','Axolotl',2,'58-002-629');
 INSERT INTO animal VALUES
-(543216354654321,'Murderface','M','Ferret',1,'58-002-629');
+('543216354654321','Murderface','M','Ferret',1,'58-002-629');
 INSERT INTO animal VALUES
-(1918172625,'A.Kitler','M','Cat',8,'98-572-119');
+('1918172625','A.Kitler','M','Cat',8,'98-572-119');
 INSERT INTO animal VALUES
-(543210987650082,'Fidopheles','M','Dog',5,'21-940-007');
+('543210987650082','Fidopheles','M','Dog',5,'21-940-007');
 INSERT INTO animal VALUES
-(1568344801,'Dot','F','Dog',4,'72-938-036');
+('1568344801','Dot','F','Dog',4,'72-938-036');
 INSERT INTO animal VALUES
-(345110987654321,'Polly','N','Parrot',2,'01-629-729');
+('345110987654321','Polly','N','Parrot',2,'01-629-729');
 INSERT INTO animal VALUES
-(188974465632001,'Nietzche','F','Cat',12,'01-629-729');
+('188974465632001','Nietzche','F','Cat',12,'01-629-729');
 INSERT INTO animal VALUES
-(180309840759874,'Lovelace','M','Cat',12,'83-029-728');
+('180309840759874','Lovelace','M','Cat',12,'83-029-728');
 INSERT INTO animal VALUES
-(0098175648,'B.Mouseolini','M','Mouse',2,'30-819-444');
+('0098175648','B.Mouseolini','M','Mouse',2,'30-819-444');
 INSERT INTO animal VALUES
-(54825821654321,'Raticate','F','Rat',3,'30-819-444');
+('54825821654321','Raticate','F','Rat',3,'30-819-444');
 INSERT INTO animal VALUES
-(543444987659998,'Greta','F','Turtle',4,'17-552-027');
+('543444987659998','Greta','F','Turtle',4,'17-552-027');
 
 /* Medicine */
 INSERT INTO medicine VALUES
@@ -251,32 +298,44 @@ INSERT INTO medicine VALUES
 INSERT INTO medicine VALUES
 ('Nature Zone SNZ59211 Turtle Eye Drops', '2oz', 10);
 
+DELETE medicine
+WHERE rowid NOT IN (
+        SELECT min(rowid)
+        FROM medicine
+        GROUP BY name, dosage, stock);
+
 /*Consultations*/
 
 INSERT INTO consultation VALUES
-(TO_DATE('1520, 06/05/16', 'hh24mi dd/mm/yy'), '34-654-993',  1234567890, 'cat had injured paw');
+(TO_DATE('1520, 06/05/16', 'hh24mi dd/mm/yy'), '34-654-993',  '1234567890','48-389-639', 'cat had injured paw',380);
 INSERT INTO consultation VALUES
-(TO_DATE('1210, 07/05/16', 'hh24mi dd/mm/yy'), '23-456-369',  543210987654321, 'near drowning');
+(TO_DATE('1210, 07/05/16', 'hh24mi dd/mm/yy'), '23-456-369',  '543210987654321','58-002-629', 'near drowning',200);
 INSERT INTO consultation VALUES
-(TO_DATE('1300, 02/05/16', 'hh24mi dd/mm/yy'),'34-654-993',  543216354654321, 'fell out of tree');
+(TO_DATE('1300, 02/05/16', 'hh24mi dd/mm/yy'),'34-654-993',  '543216354654321','58-002-629', 'fell out of tree',120);
 INSERT INTO consultation VALUES
-(TO_DATE('1300, 02/05/16', 'hh24mi dd/mm/yy'),'45-289-369',  1918172625, 'dental work');
+(TO_DATE('1300, 02/05/16', 'hh24mi dd/mm/yy'),'45-289-381',  '1918172625','98-572-119', 'dental work',350);
 INSERT INTO consultation VALUES
-(TO_DATE('0900, 03/06/16', 'hh24mi dd/mm/yy'), '89-672-361',  543210987650082, 'dog had conjunctivitis');
+(TO_DATE('0900, 03/06/16', 'hh24mi dd/mm/yy'), '89-672-361',  '543210987650082','21-940-007', 'dog had conjunctivitis',120);
 INSERT INTO consultation VALUES
-(TO_DATE('0840, 26/06/16', 'hh24mi dd/mm/yy'),'46-382-759',  1568344801, 'dog had thorn in foot');
+(TO_DATE('0840, 26/06/16', 'hh24mi dd/mm/yy'),'46-382-759',  '1568344801','72-938-036', 'dog had thorn in foot',60);
 INSERT INTO consultation VALUES
-(TO_DATE('1450, 21/06/16', 'hh24mi dd/mm/yy'),'39-655-456',  345110987654321, 'broken wing');
+(TO_DATE('1450, 21/06/16', 'hh24mi dd/mm/yy'),'39-655-456',  '345110987654321','01-629-729', 'broken wing',300);
 INSERT INTO consultation VALUES
-(TO_DATE('1440, 18/06/16', 'hh24mi dd/mm/yy'), '88-855-987',  188974465632001, 'kidney failure');
+(TO_DATE('1440, 18/06/16', 'hh24mi dd/mm/yy'), '88-855-987',  '188974465632001','01-629-729', 'kidney failure',10000);
 INSERT INTO consultation VALUES
-(TO_DATE('1200, 06/07/16', 'hh24mi dd/mm/yy'),'32-325-334',  180309840759874, 'hit by car, bruising');
+(TO_DATE('1200, 06/07/16', 'hh24mi dd/mm/yy'),'32-325-334',  '180309840759874','83-029-728', 'hit by car, bruising',500);
 INSERT INTO consultation VALUES
-(TO_DATE('1300, 15/07/16', 'hh24mi dd/mm/yy'),'52-385-949',  0098175648, 'routine checkup');
+(TO_DATE('1300, 15/07/16', 'hh24mi dd/mm/yy'),'52-385-949',  '0098175648','30-819-444', 'routine checkup',60);
 INSERT INTO consultation VALUES
-(TO_DATE('1135, 17/07/16', 'hh24mi dd/mm/yy'),'78-675-678',  54825821654321, 'broken squeaker');
+(TO_DATE('1135, 17/07/16', 'hh24mi dd/mm/yy'),'78-675-678',  '54825821654321','30-819-444', 'broken squeaker',200);
 INSERT INTO consultation VALUES
-(TO_DATE('1625, 05/08/16', 'hh24mi dd/mm/yy'),'45-678-765',  543444987659998, 'shell needed cleaning');
+(TO_DATE('1625, 05/08/16', 'hh24mi dd/mm/yy'),'45-678-765',  '543444987659998','17-552-027', 'shell needed cleaning',100);
+
+DELETE consultation
+WHERE rowid NOT IN (
+        SELECT min(rowid)
+        FROM consultation
+        GROUP BY treatment_slot, vet_ird, animal_id, description);
 
 /*Prescription*/
 INSERT INTO prescription VALUES
@@ -284,9 +343,9 @@ INSERT INTO prescription VALUES
 INSERT INTO prescription VALUES
 (78913, 'Take once every two days', TO_DATE('1210, 07/05/16', 'hh24mi dd/mm/yy'), '23-456-369');
 INSERT INTO prescription VALUES
-(31267, 'Take Four times daily', TO_DATE('1300, 02/05/16', 'hh24mi dd/mm/yy') ,'34-645-993');
+(31267, 'Take Four times daily', TO_DATE('1300, 02/05/16', 'hh24mi dd/mm/yy') ,'34-654-993');
 INSERT INTO prescription VALUES
-(55342,  'Apply once orally', TO_DATE('1300, 02/05/16', 'hh24mi dd/mm/yy'), '45-289-369');
+(55342,  'Apply once orally', TO_DATE('1300, 02/05/16', 'hh24mi dd/mm/yy'), '45-289-381');
 INSERT INTO prescription VALUES
 (62242, 'Take once daily', TO_DATE('0900, 03/06/16', 'hh24mi dd/mm/yy'), '89-672-361');
 INSERT INTO prescription VALUES
@@ -303,6 +362,12 @@ INSERT INTO prescription VALUES
 (48242, 'Take once daily', TO_DATE('1135, 17/07/16', 'hh24mi dd/mm/yy'), '78-675-678');
 INSERT INTO prescription VALUES
 (51214, 'Take three times daily', TO_DATE('1625, 05/08/16', 'hh24mi dd/mm/yy'), '45-678-765');
+
+DELETE prescription
+WHERE rowid NOT IN (
+        SELECT min(rowid)
+        FROM prescription
+        GROUP BY prescription_num, instructions, treatment_slot, vet_ird);
 
 /*Prescribed In*/
 INSERT INTO prescribed_in VALUES
@@ -330,9 +395,15 @@ INSERT INTO prescribed_in VALUES
 INSERT INTO prescribed_in VALUES
 (14, 51214, 'Nature Zone SNZ59211 Turtle Eye Drops', '2oz');
 
+DELETE prescribed_in
+WHERE rowid NOT IN (
+        SELECT min(rowid)
+        FROM prescribed_in
+        GROUP BY quantity, p_num, name, dosage);
+
 /*City Postcode*/
 
-INSERT INTO city_pc VALUES
+INSERT INTO city_pc (city,postcode) VALUES
 ('Dunedin', '9016');
 INSERT INTO city_pc VALUES
 ('Dunedin', '9012');

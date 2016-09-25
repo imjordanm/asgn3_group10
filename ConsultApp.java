@@ -56,11 +56,18 @@ public class ConsultApp {
 		String vetird = vetIRD(vetquery, con); //execute query
 		consult.setVetIrd(vetird);				
 
+		//Animal Id 	
 		//dummy data
 		//to be completed by Sam
-		consult.setAnimalID(123456); // Store animal id number in consultation object
+		consult.setAnimalID("54825821654321"); // Store animal id number in consultation object
 
+		consult.setOwnerID("30-819-444");
+		
 		consult.setDescription(getDescription()); // Prompt user for description
+		
+		double cost = 100.00;
+		consult.setCost(cost);			
+
 
 		// Inser consult entry in DB
 		consult.insertConsult(con);

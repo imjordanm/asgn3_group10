@@ -15,8 +15,10 @@ public class ConsultData {
 
 	private String timeslot; 
 	private String vet_ird;
-	private int animal_id;
+	private String animal_id;
+	private String owner_id;
 	private String description;
+	private double cost;
 	
 	//default constructor
   	public ConsultData() { }
@@ -32,14 +34,24 @@ public class ConsultData {
 	}//end method
 
 	/**set the value of animal_id datafield*/
-	public void setAnimalID (int animal_id){
+	public void setAnimalID (String animal_id){
 		this.animal_id = animal_id;
 	}//end method
+
+	/**set the value of owner_id datafield*/
+        	public void setOwnerID (String owner_id){
+                this.owner_id = owner_id;
+        }//end method
 	
 	/**set the value of description data field*/
 	public void setDescription (String description){
 		this.description = description;
 	}
+	
+	/**set the value of billing data field*/
+        public void setCost (double cost){
+                this.cost = cost;
+        }
 	
 	/**return stored value of vet_ird*/
 	public String getVetIrd(){
@@ -50,7 +62,7 @@ public class ConsultData {
 	public void insertConsult(Connection c) {
 	
 		String command = "INSERT INTO consultation "
-						+ "VALUES(TO_DATE(? ,'yyyy-mm-dd hh24:mi:ss'), ?, ?, ?)";
+						+ "VALUES(TO_DATE(? ,'yyyy-mm-dd hh24:mi:ss'), ?, ?, ?, ?, ?)";
 						
 		PreparedStatement pstmt = null;
 		
@@ -58,11 +70,13 @@ public class ConsultData {
 			pstmt = c.prepareStatement(command);
 			pstmt.setString(1, timeslot);
 			pstmt.setString(2, vet_ird);
-			pstmt.setInt(3, animal_id);
-			pstmt.setString(4, description);
-			
+			pstmt.setString(3, animal_id);
+			pstmt.setString(4, owner_id);
+			pstmt.setString(5, description);
+			pstmt.setDouble(6, cost);
+
 			pstmt.executeUpdate();
-                        System.out.println("Consultation information:\nDate: " + timeslot + "\nVet: " + vet_ird + "\nAnimal: " + animal_id + "\nDescription: " + description);
+                        System.out.println("Consultation information:\nDate: " + timeslot + "\nVet: " + vet_ird + "\nAnimal: " + animal_id + "\nOwner: " + owner_id + "\nDescription: " + description + "\nCost: " + cost);
 		}
 		catch (SQLException e ) {
 		quit(e.getMessage());
