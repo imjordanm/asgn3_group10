@@ -54,8 +54,18 @@ public class ConsultApp {
          * vet_ird attribute
          * No check to make sure user is a vet implemented
          */ 			
-        String vetquery = getVetInfo(); // prompt for name and generate query			
-        String vetird = vetIRD(vetquery, con); //execute query
+        //String vetquery = getVetInfo(); // prompt for name and generate query			
+        
+        String vetird = null;
+        vetird = vetIRD(con); //execute query
+        
+        String position = posCheck(vetird, con); //check employee position
+		while(!position.equals("vet")) {
+			System.out.println("Not a vet");
+			vetird = vetIRD(con);
+			position = posCheck(vetird, con);
+		}      
+        
         consult.setVetIrd(vetird);				
         consult.setAnimalID(getAnimalID());
         consult.setOwnerID(con);
@@ -157,39 +167,90 @@ public class ConsultApp {
 
 
     /** 
-     * Runs the query from getVetInfo
-     * Takes query as string and connection object as input
-     * Returns vet IRD as string
-     * Justin Teare
-     */
-    public String vetIRD(String command, Connection c) { 
+	 * Runs the query from getVetInfo
+	 * Takes query as string and connection object as input
+	 * Returns vet IRD as string
+	 * Justin Teare
+	 */
+	public String vetIRD(Connection c) { 
+		
+		String command = "SELECT ird FROM employees " +
+			"WHERE UPPER(f_name) = UPPER(?) " +
+			"AND UPPER(l_name) = UPPER(?)";
+				
+		// Run query and process results
+		PreparedStatement pstmt = null;
+		ResultSet result = null;
+		String outString = new String();
 
-        // Run query and process results
-        Statement stmt = null;
-        ResultSet result = null;
-        String outString = new String();
+		try {
+			Scanner scan = new Scanner(System.in);
+			String fname = new String();
+			String lname = new String();
+			pstmt = c.prepareStatement(command);
+			System.out.println("Vet First Name: ");
+			fname = scan.nextLine();
+			pstmt.setString(1, fname);
+			System.out.println("Vet Last Name: ");
+			lname = scan.nextLine();
+			pstmt.setString(2, lname);		
+			result = pstmt.executeQuery();
+			
+			
+			result.next();
+			
+			while(!result.next()) {
+				result.close();
+				System.out.println("Employee not found");
+				System.out.println("Vet First Name: ");
+				pstmt.setString(1, scan.nextLine());
+				System.out.println("Vet Last Name: ");
+				pstmt.setString(2, scan.nextLine());
+				result = pstmt.executeQuery();
+			}								
+			outString = result.getString(1);
+			System.out.println(outString);
+		}
+		catch (SQLException e ) {
+			quit(e.getMessage());
 
-        try {
-            stmt = c.createStatement();
-            result = stmt.executeQuery(command);
-            result.next();
-            outString = result.getString(1);
-            //System.out.println(outString);
-        }
-        catch (SQLException e ) {
-            quit(e.getMessage());
-
+		} finally {
+			try {
+				if (pstmt != null) { pstmt.close(); }
+				if (result != null) {result.close(); }
+			} catch (Exception e) {
+				System.out.println("Error in closing " + e.getMessage());
+			}
+		}	
+		return outString;
+	} // end vetIRD()
+	
+	public String posCheck(String ird, Connection c) {
+		String command = "SELECT position FROM employees WHERE ird=?";
+		PreparedStatement pstmt = null;
+		ResultSet result = null;
+		String outString = new String();
+		try { 
+			pstmt = c.prepareStatement(command);
+			pstmt.setString(1, ird);
+			result = pstmt.executeQuery();
+			result.next();
+			outString = result.getString(1);
+		}
+		catch (SQLException e ) {
+                        quit(e.getMessage());
         } finally {
-            try {
-                if (stmt != null) { stmt.close(); }
-                result.close();
-            } catch (Exception e) {
-                System.out.println("Error in closing " + e.getMessage());
-            }
-        }	
+                try {
+                	if (pstmt != null) { pstmt.close(); }
+                    result.close();
+                } catch (Exception e) {
+                    System.out.println("Error in closing " + e.getMessage());
+                }
+        	}
         return outString;
-    } // end vetIRD()
-
+    } // end posCheck()
+   
+    
     /**
      * Asks the user for the animal ID
      * Returns the animal ID that is scanned in
