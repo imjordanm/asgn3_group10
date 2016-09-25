@@ -55,7 +55,6 @@ public class ConsultApp {
 		//String vetquery = getVetInfo(); // prompt for name and generate query
 		String vetird = null;
 		vetird = vetIRD(con); //execute query
-		
 		String position = posCheck(vetird, con); //check employee position
 		while(!position.equals("vet")) {
 			System.out.println("Not a vet");
@@ -204,8 +203,11 @@ public class ConsultApp {
 			lname = scan.nextLine();
 			pstmt.setString(2, lname);		
 			result = pstmt.executeQuery();
+			
+			
 			result.next();
-			/*while(!result.next()) {
+			
+			while(!result.next()) {
 				result.close();
 				System.out.println("Employee not found");
 				System.out.println("Vet First Name: ");
@@ -213,11 +215,9 @@ public class ConsultApp {
 				System.out.println("Vet Last Name: ");
 				pstmt.setString(2, scan.nextLine());
 				result = pstmt.executeQuery();
-			}	*/	
-			
-				
+			}								
 			outString = result.getString(1);
-			//System.out.println(outString);
+			System.out.println(outString);
 		}
 		catch (SQLException e ) {
 			quit(e.getMessage());
@@ -225,7 +225,7 @@ public class ConsultApp {
 		} finally {
 			try {
 				if (pstmt != null) { pstmt.close(); }
-				result.close();
+				if (result != null) {result.close(); }
 			} catch (Exception e) {
 				System.out.println("Error in closing " + e.getMessage());
 			}
@@ -234,28 +234,29 @@ public class ConsultApp {
 	} // end vetIRD()   
 	
 	public String posCheck(String ird, Connection c) {
-		
-		String command = "SELECT position FROM employees WHERE ird = ?";
+		String command = "SELECT position FROM employees WHERE ird=?";
 		PreparedStatement pstmt = null;
 		ResultSet result = null;
 		String outString = new String();
 		try { 
+			pstmt = c.prepareStatement(command);
 			pstmt.setString(1, ird);
-			result = pstmt.executeQuery(command);
+			result = pstmt.executeQuery();
 			result.next();
+			outString = result.getString(1);
 		}
 		catch (SQLException e ) {
                         quit(e.getMessage());
-                } finally {
-                        try {
-                                if (pstmt != null) { pstmt.close(); }
-                                result.close();
-                        } catch (Exception e) {
-                                System.out.println("Error in closing " + e.getMessage());
-                        }
+        } finally {
+                try {
+                	if (pstmt != null) { pstmt.close(); }
+                    result.close();
+                } catch (Exception e) {
+                    System.out.println("Error in closing " + e.getMessage());
                 }
-                return outString;
-        } // end posCheck()
+        	}
+        return outString;
+    } // end posCheck()
 
 	/**
 	 * Asks the user for the consultation description
