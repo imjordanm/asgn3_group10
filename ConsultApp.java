@@ -52,8 +52,18 @@ public class ConsultApp {
 		 * vet_ird attribute
 		 * No check to make sure user is a vet implemented
 		 */ 			
-		String vetquery = getVetInfo(); // prompt for name and generate query			
-		String vetird = vetIRD(vetquery, con); //execute query
+		//String vetquery = getVetInfo(); // prompt for name and generate query
+		String vetird = null;
+		vetird = vetIRD(con); //execute query
+		
+		String position = posCheck(vetird, con); //check employee position
+		while(!position.equals("vet")) {
+			System.out.println("Not a vet");
+			vetird = vetIRD(con);
+			position = posCheck(vetird, con);
+		}
+				
+		
 		consult.setVetIrd(vetird);				
 
 		//Animal Id 	
@@ -152,6 +162,7 @@ public class ConsultApp {
 		System.out.print("Vet First Name: ");	
 		String fname = (scan.nextLine());
 		System.out.println();		
+	
 		System.out.print("Vet Last Name: ");	
 		String lname = (scan.nextLine());
 		System.out.println();
@@ -170,17 +181,41 @@ public class ConsultApp {
 	 * Returns vet IRD as string
 	 * Justin Teare
 	 */
-	public String vetIRD(String command, Connection c) { 
-
+	public String vetIRD(Connection c) { 
+		
+		String command = "SELECT ird FROM employees " +
+			"WHERE UPPER(f_name) = UPPER(?) " +
+			"AND UPPER(l_name) = UPPER(?)";
+				
 		// Run query and process results
-		Statement stmt = null;
+		PreparedStatement pstmt = null;
 		ResultSet result = null;
 		String outString = new String();
 
 		try {
-			stmt = c.createStatement();
-			result = stmt.executeQuery(command);
+			Scanner scan = new Scanner(System.in);
+			String fname = new String();
+			String lname = new String();
+			pstmt = c.prepareStatement(command);
+			System.out.println("Vet First Name: ");
+			fname = scan.nextLine();
+			pstmt.setString(1, fname);
+			System.out.println("Vet Last Name: ");
+			lname = scan.nextLine();
+			pstmt.setString(2, lname);		
+			result = pstmt.executeQuery();
 			result.next();
+			/*while(!result.next()) {
+				result.close();
+				System.out.println("Employee not found");
+				System.out.println("Vet First Name: ");
+				pstmt.setString(1, scan.nextLine());
+				System.out.println("Vet Last Name: ");
+				pstmt.setString(2, scan.nextLine());
+				result = pstmt.executeQuery();
+			}	*/	
+			
+				
 			outString = result.getString(1);
 			//System.out.println(outString);
 		}
@@ -189,7 +224,7 @@ public class ConsultApp {
 
 		} finally {
 			try {
-				if (stmt != null) { stmt.close(); }
+				if (pstmt != null) { pstmt.close(); }
 				result.close();
 			} catch (Exception e) {
 				System.out.println("Error in closing " + e.getMessage());
@@ -197,6 +232,30 @@ public class ConsultApp {
 		}	
 		return outString;
 	} // end vetIRD()   
+	
+	public String posCheck(String ird, Connection c) {
+		
+		String command = "SELECT position FROM employees WHERE ird = ?";
+		PreparedStatement pstmt = null;
+		ResultSet result = null;
+		String outString = new String();
+		try { 
+			pstmt.setString(1, ird);
+			result = pstmt.executeQuery(command);
+			result.next();
+		}
+		catch (SQLException e ) {
+                        quit(e.getMessage());
+                } finally {
+                        try {
+                                if (pstmt != null) { pstmt.close(); }
+                                result.close();
+                        } catch (Exception e) {
+                                System.out.println("Error in closing " + e.getMessage());
+                        }
+                }
+                return outString;
+        } // end posCheck()
 
 	/**
 	 * Asks the user for the consultation description
@@ -332,11 +391,10 @@ public class ConsultApp {
 		return dosageMed;
 	}
 
-
 	// Used to output an error message and exit
 	private void quit(String message) {
 		System.err.println(message);
-		System.exit(1);
+	//	System.exit(1);
 	}
 
 } // end class ConsultApp
